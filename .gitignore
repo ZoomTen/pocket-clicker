@@ -1,0 +1,6 @@
+_build/
+*.gb
+*.ihx
+*.map
+*.noi
+*.sym
