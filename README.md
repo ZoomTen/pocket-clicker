@@ -4,7 +4,7 @@ A Cookie Clicker clone for the Game Boy written in Nim! (plus my own `crt0` and 
 
 Unlike my [last proof-of-concept](https://github.com/ZoomTen/nim-gb-test), this time I try not to depend too much on GBDK (particularly the GB-specific part), but rather to try and compile everything from the C that Nim generates.
 
-![](screenshot.png)
+![](docs/screenshot.png)
 
 (Pokémon-theme hopefully temporary)
 
