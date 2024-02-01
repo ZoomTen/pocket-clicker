@@ -1,3 +1,5 @@
+{.warning[UnusedImport]: off.}
+
 import ./scenes/game
 import ./utils/[interrupts, math]
 

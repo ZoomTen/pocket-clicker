@@ -105,7 +105,7 @@ proc gameStep* (gs: var gameStruct) =
 
       if gs.counter == gs.toNext:
         gs.curLvl += 1
-        gs.curLvlStr = $gs.curLvl
+        gs.curLvlStr = $gs.curLvl.uint32
         vMap0.mapOffset(x=10'u8, y=1'u8).echo gs.curLvlStr
         # curLvl starts at 1, list is 0-index, so
         # it's the same thing as [level + 1]
@@ -191,7 +191,7 @@ proc gameLoop* () =
 
   # print status for the first time
   vMap0.mapOffset(x=10'u8, y=3'u8).echo $gameState.counter
-  vMap0.mapOffset(x=10'u8, y=1'u8).echo $gameState.curLvl
+  vMap0.mapOffset(x=10'u8, y=1'u8).echo $gameState.curLvl.uint32
   vMap0.mapOffset(x=10'u8, y=5'u8).echo $gameState.toNextDifference
 
   while true:

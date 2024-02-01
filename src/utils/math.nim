@@ -1,4 +1,5 @@
 import std/bitops
+import ./codegen
 
 # this function has an Emulicious profiler result of 528 min/3468 max/2607 avg, 46860 total cycles
 # GBDK lib's counterpart is 3924 min/3976 max/3950 avg, 71028 total cycles

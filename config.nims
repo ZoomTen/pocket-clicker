@@ -72,7 +72,7 @@ proc setupGbdk* () =
 #-------------------------------------#
 if projectPath() == thisDir()/mainFile:
   setupGbdk()
-  switch "include", thisDir()/"include"/"gbPrelude.nim"
+  #switch "include", thisDir()/"include"/"gbPrelude.nim"
   when buildCacheHere:
     switch "nimcache", "_build"
   switch "listCmd"
