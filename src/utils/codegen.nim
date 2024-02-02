@@ -6,10 +6,15 @@ export macros
 # i can't yet find a way to make bank numbers a Nim pragma
 # so {.emit: "#pragma bank N".} will have to do for now.
 
+macro homeProc*(node: untyped): untyped = codeGenMacro("NONBANKED")
+macro bankedProc*(node: untyped): untyped = codeGenMacro("BANKED")
+macro oldCall*(node: untyped): untyped = codeGenMacro("__sdcccall(0)")
+macro newCall*(node: untyped): untyped = codeGenMacro("__sdcccall(1)")
+
 template codeGenMacro (appendString: string) {.dirty.} =
     ## thanks @rockcavera!
     result = newStmtList()
-    if node.kind != nnkProcDef:
+    if node.kind not_in [nnkProcDef, nnkFuncDef]:
         result.add(node)
         return
     # silly: if a codegen pragma already exists, add NONBANKED to it
@@ -30,7 +35,3 @@ template codeGenMacro (appendString: string) {.dirty.} =
     )
     result.add(node)
 
-macro homeProc*(node: untyped): untyped = codeGenMacro("NONBANKED")
-macro bankedProc*(node: untyped): untyped = codeGenMacro("BANKED")
-macro oldCall*(node: untyped): untyped = codeGenMacro("__sdcccall(0)")
-macro newCall*(node: untyped): untyped = codeGenMacro("__sdcccall(1)")
