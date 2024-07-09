@@ -11,8 +11,6 @@ import os
 import strutils
 import ./helpers
 
-import ../romConfig # bleh
-
 when isMainModule:
   let gbdkRoot = getGbdkRoot()
   var inputs = commandLineParams().join(" ").paramsToSdldInput()

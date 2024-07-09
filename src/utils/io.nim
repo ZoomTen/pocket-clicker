@@ -6,35 +6,47 @@ import ./codegen
 # today's computers and probably today's embedded hardware, but is FUCKED when we
 # force the same thing on an 8-bit console from 1989.
 const
-    MaxInt16StrLen = 6
-    MaxInt32StrLen = 11
+  MaxInt16StrLen = 6
+  MaxInt32StrLen = 11
 
-proc iToA (n: int16, s: ptr cstring, radix: uint8): cstring {.importc: "itoa", oldCall.} = discard
-proc lToA (n: int32, s: ptr cstring, radix: uint8): cstring {.importc: "ltoa", oldCall.} = discard
-proc ulToA (n: uint32, s: ptr cstring, radix: uint8): cstring {.importc: "ultoa", oldCall.} = discard
+proc iToA(
+    n: int16, s: ptr cstring, radix: uint8
+): cstring {.importc: "itoa", oldCall.} =
+  discard
 
-proc `$`* (x: uint32): string =
-    let xi: ptr cstring = cstring.create(MaxInt32StrLen)
-    result = $(ulToA(x, xi, 10.uint8))
-    xi.dealloc()
+proc lToA(
+    n: int32, s: ptr cstring, radix: uint8
+): cstring {.importc: "ltoa", oldCall.} =
+  discard
 
-proc `$`* (x: int32): string =
-    let xi: ptr cstring = cstring.create(MaxInt32StrLen)
-    result = $(x.lToA(xi, 10.uint8))
-    xi.dealloc()
+proc ulToA(
+    n: uint32, s: ptr cstring, radix: uint8
+): cstring {.importc: "ultoa", oldCall.} =
+  discard
 
-proc `$`* (x: int16): string =
-    let xi: ptr cstring = cstring.create(MaxInt16StrLen)
-    result = $(x.iToA(xi, 10.uint8))
-    xi.dealloc()
+proc `$`*(x: uint32): string =
+  let xi: ptr cstring = cstring.create(MaxInt32StrLen)
+  result = $(ulToA(x, xi, 10.uint8))
+  xi.dealloc()
 
-proc echo* (base: ptr UncheckedArray[byte], s: string) =
+proc `$`*(x: int32): string =
+  let xi: ptr cstring = cstring.create(MaxInt32StrLen)
+  result = $(x.lToA(xi, 10.uint8))
+  xi.dealloc()
+
+proc `$`*(x: int16): string =
+  let xi: ptr cstring = cstring.create(MaxInt16StrLen)
+  result = $(x.iToA(xi, 10.uint8))
+  xi.dealloc()
+
+proc echo*(base: ptr UncheckedArray[byte], s: string) =
   ## Echo override, but now you can place it directly in VRAM
   var i: uint8 = 0
   var atAddr: ptr byte = cast[ptr byte](base)
   for letter in s:
-  # precalculate destination address to mitigate TOCTTOU problems
+    # precalculate destination address to mitigate TOCTTOU problems
     atAddr = base[i].addr
-    while busy in rStat[]: discard
+    while busy in rStat[]:
+      discard
     atAddr[] = letter.uint8
     i += 1

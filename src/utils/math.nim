@@ -4,13 +4,14 @@ import ./codegen
 # this function has an Emulicious profiler result of 528 min/3468 max/2607 avg, 46860 total cycles
 # GBDK lib's counterpart is 3924 min/3976 max/3950 avg, 71028 total cycles
 # who knew just adding stuff would be faster (?)
-func mulLong* (x, y: clong): clong {.exportc: "_mullong", homeProc.} =
+func mulLong*(x, y: clong): clong {.exportc: "_mullong", homeProc.} =
   var
     res: clong = 0
     x1 = x
     y1 = y
   while y1 > 0:
-    if y1.bitAnd(1) == 1: res += x1
+    if y1.bitAnd(1) == 1:
+      res += x1
     x1 = x1 shl 1
     y1 = y1 shr 1
   return res

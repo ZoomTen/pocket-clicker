@@ -3,7 +3,7 @@ when defined(nimscript): # for things that need outside access
 
   const
     # main source to build the ROM
-    mainFile* = "src"/"main.nim"
+    mainFile* = "src" / "main.nim"
 
 # everything else
 

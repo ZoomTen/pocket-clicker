@@ -13,6 +13,7 @@ import ../romConfig # bleh
 import std/streams
 import std/strutils
 import std/math
+import std/algorithm
 
 ########################################################################
 
@@ -60,50 +61,50 @@ proc makeBin(ihxFileName: string): seq[byte] =
     ):
       highestAddr = someHighAddr
   
-  var canvas = newSeq[byte](highestAddr)
+  var convertedBinary = newSeq[byte](highestAddr)
   for record in i.records:
     for byteIndex in 0..<record.data.len():
-      canvas[record.address + uint16(byteIndex)] =
+      convertedBinary[record.address + uint16(byteIndex)] =
         record.data[byteIndex]
-  return canvas
+  return convertedBinary
 
 proc ihx2bin(ihxFileName, binFileName, gameName: string): void =
   var
-    canvas = ihxFileName.makeBin()
+    romImage = ihxFileName.makeBin()
     st = binFileName.openFileStream(fmWrite)
-  canvas.setLen(
-    ceilDiv(canvas.len, 0x4000) * 0x4000
+  romImage.setLen(
+    ceilDiv(romImage.len, 0x4000) * 0x4000
   )
   
   # write the game title in the header
   if gameName.len > 16:
     raise newException(CatchableError, "game name must be <= 16 characters")
   
-  # I want to use canvas[a..b] = string :(
+  # I want to use romImage[a..b] = string :(
   for i in 0..<0x10:
     if i > (gameName.len - 1):
       break
-    canvas[0x134 + i] = byte(gameName[i])
+    romImage[0x134 + i] = byte(gameName[i])
     
   # fix both checksums
   # header
   var headerCheck = 0'u8
   for i in 0x134..0x14c:
-    headerCheck += canvas[i]
-  canvas[0x14d] = headerCheck
+    headerCheck += romImage[i]
+  romImage[0x14d] = headerCheck
   
   # global
   var globalCheck = 0'u16
-  for i in 0..<canvas.len:
+  for i in 0..<romImage.len:
     if i in 0x14e..0x14f:
       continue
-    globalCheck += uint16(canvas[i])
-  canvas[0x14e] = uint8((globalCheck shr 8) and 0xff)
-  canvas[0x14f] = uint8(globalCheck and 0xff)
+    globalCheck += uint16(romImage[i])
+  romImage[0x14e] = uint8((globalCheck shr 8) and 0xff)
+  romImage[0x14f] = uint8(globalCheck and 0xff)
     
   
   # write the actual file
-  st.writeData(canvas[0].addr, canvas.len)
+  st.writeData(romImage[0].addr, romImage.len)
 
 proc noi2sym(noiFileName, symFileName: string): void =
   var
@@ -114,8 +115,21 @@ proc noi2sym(noiFileName, symFileName: string): void =
     if o.startsWith("DEF "):
       let n = o.split(' ')
       assert n.len == 3
-      # TODO: convert n[2] 0x???? to GameBoy ROM format
-      syms.add("$#:$# $#" % ["00", n[2], n[1]])
+      # skip "l_" stuff because that's the section length
+      if n[1].startsWith("l_"):
+        continue
+      when false: # TODO: still assuming non-banked for now, this won't work
+        # convert address to gameboy format
+        let romAddr = fromHex[int](n[2])
+        var (bank, offset) = divmod(romAddr, 0x4000)
+        if bank > 1:
+          offset += 0x4000
+      syms.add("$#:$# $#" % [
+        "00",
+        n[2][2..^1].align(4, '0'),
+        n[1]
+      ])
+  syms.sort()
   var m = openFileStream(symFileName, fmWrite)
   for sym in syms:
     m.writeLine(sym)

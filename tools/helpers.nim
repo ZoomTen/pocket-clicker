@@ -40,7 +40,7 @@ proc paramsToSdldInput* (cmdline: string): SdldInput =
   return result
 
 proc execWithEcho* (command: string, exceptOnError: bool = true) =
-  echo command.strip()
+  #echo command.strip()
   let (outStr, exitCode) = execCmdEx(command)
   let outStrDisp = outStr.strip()
   if exceptOnError:

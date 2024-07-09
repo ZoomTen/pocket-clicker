@@ -13,10 +13,12 @@ proc precompileTools() =
   for toolName in tools:
     if findExe("tools" / toolName) == "":
       echo "make '" & toolName & "' wrapper..."
-      selfExec([
-        "c", "-d:release", "--hints:off",
-        thisDir() / "tools" / toolName & ".nim"
-      ].join(" "))
+      selfExec(
+        ["c", "-d:release", "--hints:off", thisDir() / "tools" / toolName & ".nim"].join(
+          " "
+        )
+      )
+
 #-------------------------------------#
 
 # Setup toolchain
@@ -27,10 +29,10 @@ proc setupGbdk() =
 
   # abuse the c compiler options to use a nimscript
   # for compiling, linking and finalization
-  put "icc.exe", thisDir()/"tools"/"compile"
+  put "icc.exe", thisDir() / "tools" / "compile"
   put "icc.options.always", ""
 
-  put "icc.linkerexe", thisDir()/"tools"/"link"
+  put "icc.linkerexe", thisDir() / "tools" / "link"
   put "icc.options.linker", ""
 
   # basic nim compiler options
@@ -42,7 +44,7 @@ proc setupGbdk() =
   switch "define", "noSignalHandler"
   switch "define", "danger"
   switch "define", "nimPreviewSlimSystem"
-  
+
   ## uncomment to enable nim source lines in the ASM
   # switch "debugger", "native"
 
@@ -64,11 +66,12 @@ proc setupGbdk() =
 
   ## gameDebug: nothing much
   # switch "define", "gameDebug"
+
 #-------------------------------------#
 
 # Set compile options specific to main file
 #-------------------------------------#
-if projectPath() == thisDir()/mainFile:
+if projectPath() == thisDir() / mainFile:
   setupGbdk()
   when buildCacheHere:
     switch "nimcache", "_build"
@@ -79,12 +82,8 @@ if projectPath() == thisDir()/mainFile:
 #-------------------------------------#
 task build, "Build a Game Boy ROM":
   precompileTools()
-  let
-    args = commandLineParams()[1..^1].join(" ")
-  selfExec([
-    "c", args, "-o:" & romName & ".gb",
-    thisDir() / mainFile
-  ].join(" "))
+  let args = commandLineParams()[1 ..^ 1].join(" ")
+  selfExec(["c", args, "-o:" & romName & ".gb", thisDir() / mainFile].join(" "))
 
 task clean, "Clean up this directory's compiled files":
   when buildCacheHere:
@@ -109,7 +108,7 @@ task cleanDist, "Clean up this directory's residual files":
     echo("removed $#$#" % [romName, ext])
 
   for ext in ["", ".exe"]:
-    for toolProg in ["tools"/"compile", "tools"/"link"]:
+    for toolProg in ["tools" / "compile", "tools" / "link"]:
       rmFile(toolProg & ext)
       echo("removed $#$#" % [toolProg, ext])
 #-------------------------------------#
