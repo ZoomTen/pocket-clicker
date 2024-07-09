@@ -14,7 +14,7 @@ jobs:
     - name: Install Nim
       uses: iffy/install-nim@v5
       with:
-        version: 2.0.4
+        version: 2.0.8
     
     - name: Checkout
       uses: actions/checkout@v4.1.1
@@ -31,12 +31,12 @@ jobs:
       uses: actions/cache@v4
       with:
         path: gbdk
-        key: ${{ runner.os }}-gbdk-4.x
+        key: ${{ runner.os }}-gbdk-4.3.0
     
     - name: Setup GBDK
       if: ${{ steps.cache-gbdk.outputs.cache-hit != 'true' }}
       run: |
-        wget https://github.com/gbdk-2020/gbdk-2020/releases/download/pre-release/gbdk-linux64.tar.gz
+        wget https://github.com/gbdk-2020/gbdk-2020/releases/download/4.3.0/gbdk-linux64.tar.gz
         tar xvf gbdk-linux64.tar.gz
     
     - name: Build
