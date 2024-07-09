@@ -1,5 +1,3 @@
-#!/usr/bin/env -S nim e --hints:off
-
 ## Mimics icc for compiling. Its purpose is to discern between
 ## C sources and ASM sources and makes it somewhat manageable.
 ##
@@ -16,14 +14,8 @@ import ./helpers
 import ../romConfig # bleh
 
 when isMainModule:
-  # check for gbdk root as in ../config.nims
-  let
-    gbdkRoot = getEnv("GBDK_ROOT")
-  when not defined(nimsuggest):
-    assert gbdkRoot != "", "Please set the GBDK_ROOT environment variable."
-
-  # parse the params minus "nim" "e" "--hints:off"
-  var inputs = commandLineParams()[3..^1].join(" ").paramsToSdldInput()
+  let gbdkRoot = getGbdkRoot()
+  var inputs = commandLineParams().join(" ").paramsToSdldInput()
 
   # I would hope this was invoked as 1 source file = 1 object file
   let
@@ -40,7 +32,7 @@ when isMainModule:
         "-c", # compile only
         # basic includes
           "-I" & gbdkRoot / "include", # gbdk libraries
-          "-I" & thisDir().parentDir() / "include", # our stuff and our nimbase.h
+          "-I" & getCurrentDir() / "include", # our stuff and our nimbase.h
         # target architecture
           "-msm83",
           "-D" & "__TARGET_gb",
@@ -68,4 +60,4 @@ when isMainModule:
       ]
     
     else: raise newException(Exception, "unknown format")
-  ).join(" "), false) # bypass warnings 
+  ).join(" ")) # bypass warnings 

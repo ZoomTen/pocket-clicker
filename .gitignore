@@ -4,3 +4,5 @@ _build/
 *.map
 *.noi
 *.sym
+tools/compile
+tools/link

@@ -22,18 +22,28 @@ let
 
 # Setup scripts
 #-------------------------------------#
-proc setupGbdk* () =
+
+proc precompileTools() =
+  let tools = ["compile", "link"]
+
+  for toolName in tools:
+    if findExe("tools" / toolName) == "":
+      echo "make '" & toolName & "' wrapper..."
+      selfExec([
+        "c", "-d:release", "--hints:off",
+        thisDir() / "tools" / toolName & ".nim"
+      ].join(" "))
+
+proc setupGbdk() =
   # set c compiler as ""icc"" but is actually sdcc
   switch "cc", "icc"
 
   # abuse the c compiler options to use a nimscript
   # for compiling, linking and finalization
-  # only works on unix-like environments unfortunately
-  # can't trick it into using the current nim exe :(
-  put "icc.exe", thisDir()/"tools"/"compiler.nims"
+  put "icc.exe", thisDir()/"tools"/"compile"
   put "icc.options.always", ""
 
-  put "icc.linkerexe", thisDir()/"tools"/"link.nims"
+  put "icc.linkerexe", thisDir()/"tools"/"link"
   put "icc.options.linker", ""
 
   # basic nim compiler options
@@ -81,6 +91,7 @@ if projectPath() == thisDir()/mainFile:
 # Entry points
 #-------------------------------------#
 task build, "Build a Game Boy ROM":
+  precompileTools()
   let
     args = commandLineParams()[1..^1].join(" ")
   selfExec([
@@ -109,4 +120,9 @@ task cleanDist, "Clean up this directory's residual files":
   for ext in [".ihx", ".map", ".noi"]:
     rmFile(romName & ext)
     echo("removed $#$#" % [romName, ext])
+
+  for ext in ["", ".exe"]:
+    for toolProg in ["tools"/"compile", "tools"/"link"]:
+      rmFile(toolProg & ext)
+      echo("removed $#$#" % [toolProg, ext])
 #-------------------------------------#
