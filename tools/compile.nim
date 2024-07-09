@@ -1,7 +1,7 @@
 ## Mimics icc for compiling. Its purpose is to discern between
 ## C sources and ASM sources and makes it somewhat manageable.
 ##
-## Calls sdcc and sdld directly. Same kinda hack as link.nims.
+## Calls sdcc directly.
 ##
 ## Compilation is slow, but I guess that's the kinda
 ## price to pay for *full* control over the C compiler invocation.

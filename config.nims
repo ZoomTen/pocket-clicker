@@ -5,24 +5,8 @@ const
   # whether or not we should be able inspect the output here
   buildCacheHere = true
 
-# GBDK dirs
+# Precompile "scripts"
 #-------------------------------------#
-let
-  gbdkRoot = getEnv("GBDK_ROOT")
-
-when not defined(nimsuggest):
-  doAssert(
-    gbdkRoot != "", "Please set the GBDK_ROOT env var."
-  )
-
-let
-  gbdkBin = gbdkRoot / "bin"
-  gbdkInc = gbdkRoot / "include"
-#-------------------------------------#
-
-# Setup scripts
-#-------------------------------------#
-
 proc precompileTools() =
   let tools = ["compile", "link"]
 
@@ -33,7 +17,10 @@ proc precompileTools() =
         "c", "-d:release", "--hints:off",
         thisDir() / "tools" / toolName & ".nim"
       ].join(" "))
+#-------------------------------------#
 
+# Setup toolchain
+#-------------------------------------#
 proc setupGbdk() =
   # set c compiler as ""icc"" but is actually sdcc
   switch "cc", "icc"
@@ -79,10 +66,10 @@ proc setupGbdk() =
   # switch "define", "gameDebug"
 #-------------------------------------#
 
+# Set compile options specific to main file
 #-------------------------------------#
 if projectPath() == thisDir()/mainFile:
   setupGbdk()
-  #switch "include", thisDir()/"include"/"gbPrelude.nim"
   when buildCacheHere:
     switch "nimcache", "_build"
   switch "listCmd"
